@@ -2,60 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto-Compute Acknowledgement Receipt</title>
+    <title>A4 Acknowledgement Receipt</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #e0e0e0; padding: 20px; }
-        .receipt-card { 
-            background: white; max-width: 750px; margin: auto; padding: 40px; 
-            border: 1px solid #ccc; box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+        /* A4 Setup */
+        body { background: #f0f0f0; margin: 0; padding: 20px; font-family: 'Arial', sans-serif; }
+        
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 10mm auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            position: relative;
         }
-        [contenteditable="true"] { padding: 2px 5px; border-radius: 3px; transition: 0.2s; }
-        [contenteditable="true"]:hover { background-color: #fff9c4; outline: 1px dashed #ffb300; }
-        
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1a1a1a; padding-bottom: 10px; }
-        .header h1 { margin: 0; font-size: 26px; text-transform: uppercase; }
-        
-        .details { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #1a1a1a; color: white; padding: 12px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #ddd; }
-        
-        .qty-input, .rate-input { width: 80px; text-align: center; font-weight: bold; color: #2d3436; }
-        .amount-cell { text-align: right; font-weight: bold; width: 120px; }
 
-        .total-section { text-align: right; margin-top: 25px; font-size: 22px; font-weight: bold; color: #d35400; }
+        .no-print { text-align: center; margin-bottom: 10px; }
+        button { padding: 10px 20px; background: #27ae60; color: white; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; }
+
+        /* Typography */
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .header h1 { margin: 0; font-size: 24pt; text-transform: uppercase; }
         
-        .payment-info { margin-top: 30px; font-size: 13px; background: #f9f9f9; padding: 15px; border-radius: 5px; }
-        .footer-container { margin-top: 50px; display: flex; justify-content: space-between; }
-        .sig { border-top: 1px solid #000; width: 220px; text-align: center; padding-top: 5px; font-size: 13px; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 11pt; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: #000; color: #fff; padding: 10px; text-align: left; font-size: 11pt; }
+        td { padding: 10px; border-bottom: 1px solid #ccc; font-size: 11pt; }
 
-        .no-print { text-align: center; margin-bottom: 20px; }
-        button { padding: 12px 30px; font-size: 16px; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 5px; font-weight: bold; }
+        [contenteditable="true"]:hover { background: #fffde7; outline: 1px dashed #ccc; }
 
+        .total-box { text-align: right; margin-top: 20px; font-size: 16pt; font-weight: bold; }
+
+        .footer-section { margin-top: 50px; display: flex; justify-content: space-between; }
+        .sig-block { width: 45%; text-align: center; }
+        .line { border-top: 1px solid #000; margin-top: 40px; padding-top: 5px; }
+
+        /* Print Settings */
         @media print {
+            body { background: none; margin: 0; padding: 0; }
+            .page { margin: 0; border: none; box-shadow: none; width: 210mm; height: 297mm; }
             .no-print { display: none; }
-            body { background: white; padding: 0; }
-            .receipt-card { border: none; box-shadow: none; width: 100%; }
+            [contenteditable="true"] { outline: none; }
         }
     </style>
 </head>
 <body>
 
 <div class="no-print">
-    <p>💡 <b>Tip:</b> I-click ang mga numero sa Quantity o Rate para mag-auto compute ang Total.</p>
-    <button onclick="window.print()">PRINT / SAVE AS PDF</button>
+    <button onclick="window.print()">PRINT TO A4 / SAVE PDF</button>
+    <p><small>Pwedeng i-edit ang lahat ng text. Auto-compute ang Amount at Total.</small></p>
 </div>
 
-<div class="receipt-card">
+<div class="page">
     <div class="header">
         <h1 contenteditable="true">Acknowledgement Receipt</h1>
-        <p contenteditable="true"><b>ERB Consumer Goods Retailing</b></p>
-        <p contenteditable="true">532 9de Febrero St., Mandaluyong City</p>
+        <div contenteditable="true"><strong>ERB Consumer Goods Retailing</strong></div>
+        <div contenteditable="true">532 9de Febrero St., Mandaluyong City</div>
     </div>
 
-    <div class="details">
+    <div class="info-row">
         <div>DATE: <span contenteditable="true">January 29, 2026</span></div>
         <div>NO: <span contenteditable="true">2025-0707-001</span></div>
     </div>
@@ -63,75 +70,70 @@
     <table>
         <thead>
             <tr>
-                <th>Description</th>
-                <th style="text-align:center">Qty</th>
-                <th style="text-align:right">Rate (Php)</th>
-                <th style="text-align:right">Amount</th>
+                <th contenteditable="true">Description</th>
+                <th style="width:15%; text-align:center">Qty</th>
+                <th style="width:20%; text-align:right">Rate (Php)</th>
+                <th style="width:20%; text-align:right">Amount</th>
             </tr>
         </thead>
-        <tbody id="receipt-body">
+        <tbody id="items">
             <tr class="item-row">
                 <td contenteditable="true">PET ID 85x55mm</td>
-                <td class="qty-input" contenteditable="true" oninput="calculate()">27</td>
-                <td class="rate-input" contenteditable="true" oninput="calculate()">70.00</td>
-                <td class="amount-cell">0.00</td>
+                <td style="text-align:center" contenteditable="true" oninput="calc()">27</td>
+                <td style="text-align:right" contenteditable="true" oninput="calc()">70.00</td>
+                <td style="text-align:right" class="amt">1,890.00</td>
             </tr>
             <tr class="item-row">
                 <td contenteditable="true">ID Holder (Portrait)</td>
-                <td class="qty-input" contenteditable="true" oninput="calculate()">27</td>
-                <td class="rate-input" contenteditable="true" oninput="calculate()">20.00</td>
-                <td class="amount-cell">0.00</td>
+                <td style="text-align:center" contenteditable="true" oninput="calc()">27</td>
+                <td style="text-align:right" contenteditable="true" oninput="calc()">20.00</td>
+                <td style="text-align:right" class="amt">540.00</td>
             </tr>
             <tr class="item-row">
                 <td contenteditable="true">ID Lace (½ inch)</td>
-                <td class="qty-input" contenteditable="true" oninput="calculate()">27</td>
-                <td class="rate-input" contenteditable="true" oninput="calculate()">45.00</td>
-                <td class="amount-cell">0.00</td>
+                <td style="text-align:center" contenteditable="true" oninput="calc()">27</td>
+                <td style="text-align:right" contenteditable="true" oninput="calc()">45.00</td>
+                <td style="text-align:right" class="amt">1,215.00</td>
             </tr>
         </tbody>
     </table>
 
-    <div class="total-section">
-        TOTAL: Php <span id="grand-total">0.00</span>
+    <div class="total-box">
+        TOTAL AMOUNT: Php <span id="grand-total">3,645.00</span>
     </div>
 
-    <div class="payment-info">
-        <b contenteditable="true">PAYMENT DETAILS:</b><br>
-        <div contenteditable="true">Bank: Edralene Balase | BPI: 8039-417-406</div>
-        <div contenteditable="true">GCash: 0921-721-6447</div>
+    <div style="margin-top: 30px; font-size: 10pt;" contenteditable="true">
+        <strong>PAYMENT METHOD:</strong><br>
+        Bank: Edralene Balase | BPI Account: 8039-417-406<br>
+        GCash: 0921-721-6447
     </div>
 
-    <div class="footer-container">
-        <div class="sig">
-            <div contenteditable="true">Authorized Personnel</div>
-            <small>Seller Signature</small>
+    <div class="footer-section">
+        <div class="sig-block">
+            <div class="line" contenteditable="true">Authorized Personnel</div>
+            <div style="font-size: 9pt;">Seller Signature</div>
         </div>
-        <div class="sig">
-            <div contenteditable="true">Customer Name</div>
-            <small>Received By</small>
+        <div class="sig-block">
+            <div class="line" contenteditable="true">Customer / Representative</div>
+            <div style="font-size: 9pt;">Received By</div>
         </div>
     </div>
 </div>
 
 <script>
-    function calculate() {
+    function calc() {
         let rows = document.querySelectorAll('.item-row');
-        let grandTotal = 0;
-
+        let total = 0;
         rows.forEach(row => {
-            let qty = parseFloat(row.querySelector('.qty-input').innerText) || 0;
-            let rate = parseFloat(row.querySelector('.rate-input').innerText.replace(/[^0-9.]/g, '')) || 0;
-            let amount = qty * rate;
-            
-            row.querySelector('.amount-cell').innerText = amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            grandTotal += amount;
+            let cells = row.querySelectorAll('td');
+            let q = parseFloat(cells[1].innerText) || 0;
+            let r = parseFloat(cells[2].innerText.replace(/,/g, '')) || 0;
+            let a = q * r;
+            cells[3].innerText = a.toLocaleString(undefined, {minimumFractionDigits: 2});
+            total += a;
         });
-
-        document.getElementById('grand-total').innerText = grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('grand-total').innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2});
     }
-
-    // Run calculation on load
-    window.onload = calculate;
 </script>
 
 </body>
