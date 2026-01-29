@@ -2,170 +2,264 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dynamic A4 Acknowledgement Receipt</title>
+    <title>Acknowledgement Receipt - ERB</title>
     <style>
-        body { background: #f0f0f0; margin: 0; padding: 20px; font-family: 'Arial', sans-serif; }
-        
+        :root {
+            --primary-dark: #1e272e;
+            --accent-gold: #c2a13e;
+            --soft-gray: #f8f9fa;
+        }
+
+        body { 
+            background: #cbd5e0; 
+            margin: 0; 
+            padding: 20px; 
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif; 
+        }
+
+        /* Toolbar for Buttons */
+        .toolbar { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            background: #cbd5e0;
+            padding: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        .btn-add { background: var(--primary-dark); color: white; }
+        .btn-del { background: #eb4d4b; color: white; }
+        .btn-print { background: #27ae60; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn:hover { opacity: 0.8; transform: translateY(-1px); }
+
+        /* A4 Page Styling */
         .page {
             width: 210mm;
             min-height: 297mm;
-            padding: 15mm;
-            margin: 10mm auto;
+            padding: 20mm;
+            margin: auto;
             background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
             box-sizing: border-box;
+            position: relative;
         }
 
-        .no-print { 
-            text-align: center; 
-            margin-bottom: 10px; 
-            position: sticky; 
-            top: 0; 
-            background: #f0f0f0; 
-            padding: 10px; 
-            z-index: 100;
+        .header {
+            border-bottom: 3px solid var(--primary-dark);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
-        
-        button { padding: 8px 15px; margin: 5px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.3s; }
-        .btn-print { background: #27ae60; color: white; }
-        .btn-add { background: #2980b9; color: white; }
-        .btn-del { background: #c0392b; color: white; }
-        button:hover { opacity: 0.8; }
 
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
-        .header h1 { margin: 0; font-size: 22pt; text-transform: uppercase; }
-        
-        .info-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 11pt; }
-        
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th { background: #000; color: #fff; padding: 8px; text-align: left; font-size: 10pt; }
-        td { padding: 8px; border-bottom: 1px solid #ccc; font-size: 10pt; }
+        .brand h1 { margin: 0; font-size: 32px; color: var(--primary-dark); letter-spacing: -1px; }
+        .brand p { margin: 2px 0; font-size: 12px; color: #555; }
 
-        [contenteditable="true"] { outline: none; }
-        [contenteditable="true"]:focus { background: #fffde7; }
+        .title-box { text-align: right; }
+        .title-box h2 { 
+            margin: 0; 
+            font-size: 20px; 
+            color: var(--accent-gold); 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
 
-        .total-box { text-align: right; margin-top: 15px; font-size: 14pt; font-weight: bold; border-top: 2px solid #000; padding-top: 5px; }
+        /* Editable Areas */
+        [contenteditable="true"] { outline: none; transition: 0.2s; }
+        [contenteditable="true"]:focus { background: #fff9c4; padding: 0 2px; }
 
-        .footer-section { margin-top: 40px; display: flex; justify-content: space-between; }
-        .sig-block { width: 40%; text-align: center; }
-        .line { border-top: 1px solid #000; margin-top: 35px; padding-top: 5px; font-weight: bold; }
+        .meta-info { margin-top: 10px; font-size: 13px; color: #333; }
 
+        /* Table Design */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { 
+            background: var(--primary-dark); 
+            color: white; 
+            padding: 12px; 
+            text-align: left; 
+            font-size: 11px; 
+            text-transform: uppercase; 
+        }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+
+        .col-qty { text-align: center; width: 60px; }
+        .col-rate { text-align: right; width: 120px; }
+        .col-amt { text-align: right; width: 130px; font-weight: bold; }
+
+        .total-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .total-table { width: 300px; }
+        .total-row { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            background: var(--soft-gray);
+            border: 1px solid #ddd;
+        }
+
+        .notes {
+            margin-top: 40px;
+            padding: 15px;
+            background: #fdfdfd;
+            border: 1px dashed #ccc;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .signatures {
+            margin-top: 70px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sig-box { width: 250px; text-align: center; }
+        .sig-line { border-top: 2px solid var(--primary-dark); padding-top: 10px; font-weight: bold; }
+
+        /* Printing Adjustments */
         @media print {
-            .no-print { display: none; }
-            body { background: none; padding: 0; }
-            .page { margin: 0; border: none; box-shadow: none; width: 210mm; height: 297mm; padding: 10mm; }
+            body { background: white; padding: 0; }
+            .toolbar { display: none; }
+            .page { margin: 0; box-shadow: none; width: 210mm; height: 297mm; }
         }
     </style>
 </head>
 <body>
 
-<div class="no-print">
-    <button class="btn-add" onclick="addRow()">+ ADD ITEM</button>
-    <button class="btn-del" onclick="removeRow()">- REMOVE LAST</button>
-    <button class="btn-print" onclick="window.print()">PRINT / SAVE AS PDF</button>
-    <p style="margin:5px; font-size: 12px; color: #555;">I-click ang kahit anong text para baguhin. Auto-compute ang total.</p>
+<div class="toolbar">
+    <button class="btn btn-add" onclick="addRow()">+ Magdagdag ng Item</button>
+    <button class="btn btn-del" onclick="removeRow()">- Bawasan ang Item</button>
+    <button class="btn btn-print" onclick="window.print()">Print / Save as PDF</button>
 </div>
 
 <div class="page">
     <div class="header">
-        <h1 contenteditable="true">Acknowledgement Receipt</h1>
-        <div contenteditable="true"><strong>ERB Consumer Goods Retailing</strong></div>
-        <div contenteditable="true" style="font-size: 10pt;">532 9de Febrero St., Mandaluyong City</div>
-    </div>
-
-    <div class="info-row">
-        <div>DATE: <span contenteditable="true">January 29, 2026</span></div>
-        <div>NO: <span contenteditable="true">2025-0707-001</span></div>
+        <div class="brand">
+            <h1 contenteditable="true">ERB</h1>
+            <p contenteditable="true"><b>ERB Consumer Goods Retailing</b></p>
+            <p contenteditable="true">532 9de Febrero St., Mandaluyong City</p>
+            <p contenteditable="true">Phone: 0921-721-6447</p>
+        </div>
+        <div class="title-box">
+            <h2>Acknowledgement Receipt</h2>
+            <div class="meta-info">
+                <div contenteditable="true">Date: January 29, 2026</div>
+                <div contenteditable="true">Receipt No: 2025-AR-001</div>
+            </div>
+        </div>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>Description</th>
-                <th style="width:12%; text-align:center">Qty</th>
-                <th style="width:18%; text-align:right">Rate (Php)</th>
-                <th style="width:18%; text-align:right">Amount</th>
+                <th>Item Description</th>
+                <th class="col-qty">Qty</th>
+                <th class="col-rate">Rate (₱)</th>
+                <th class="col-amt">Amount</th>
             </tr>
         </thead>
-        <tbody id="receipt-items">
+        <tbody id="item-list">
             <tr class="item-row">
-                <td contenteditable="true">PET ID 85x55mm</td>
-                <td style="text-align:center" contenteditable="true" oninput="calc()">27</td>
-                <td style="text-align:right" contenteditable="true" oninput="calc()">70.00</td>
-                <td style="text-align:right" class="amt">1,890.00</td>
+                <td contenteditable="true">PET ID (85x55mm)</td>
+                <td class="col-qty" contenteditable="true" oninput="calculate()">27</td>
+                <td class="col-rate" contenteditable="true" oninput="calculate()">70.00</td>
+                <td class="col-amt">1,890.00</td>
             </tr>
             <tr class="item-row">
                 <td contenteditable="true">ID Holder (Portrait)</td>
-                <td style="text-align:center" contenteditable="true" oninput="calc()">27</td>
-                <td style="text-align:right" contenteditable="true" oninput="calc()">20.00</td>
-                <td style="text-align:right" class="amt">540.00</td>
+                <td class="col-qty" contenteditable="true" oninput="calculate()">27</td>
+                <td class="col-rate" contenteditable="true" oninput="calculate()">20.00</td>
+                <td class="col-amt">540.00</td>
             </tr>
             <tr class="item-row">
                 <td contenteditable="true">ID Lace (½ inch)</td>
-                <td style="text-align:center" contenteditable="true" oninput="calc()">27</td>
-                <td style="text-align:right" contenteditable="true" oninput="calc()">45.00</td>
-                <td style="text-align:right" class="amt">1,215.00</td>
+                <td class="col-qty" contenteditable="true" oninput="calculate()">27</td>
+                <td class="col-rate" contenteditable="true" oninput="calculate()">45.00</td>
+                <td class="col-amt">1,215.00</td>
             </tr>
         </tbody>
     </table>
 
-    <div class="total-box">
-        GRAND TOTAL: Php <span id="grand-total">3,645.00</span>
-    </div>
-
-    <div style="margin-top: 25px; font-size: 9pt; background: #f9f9f9; padding: 10px; border-radius: 4px;" contenteditable="true">
-        <strong>PAYMENT METHOD & INSTRUCTIONS:</strong><br>
-        Bank Name: Edralene Balase | BPI Account: 8039-417-406<br>
-        GCash: 0921-721-6447<br>
-        <i>*Sample requests processed after 40% downpayment.</i>
-    </div>
-
-    <div class="footer-section">
-        <div class="sig-block">
-            <div class="line" contenteditable="true">Authorized Personnel</div>
-            <div style="font-size: 8pt; color: #666;">Issued By</div>
+    <div class="total-container">
+        <div class="total-table">
+            <div class="total-row">
+                <span>TOTAL:</span>
+                <span>₱ <span id="grand-total">3,645.00</span></span>
+            </div>
         </div>
-        <div class="sig-block">
-            <div class="line" contenteditable="true">Customer Name</div>
-            <div style="font-size: 8pt; color: #666;">Received By / Date</div>
+    </div>
+
+    <div class="notes" contenteditable="true">
+        <strong>PAYMENT DETAILS & TERMS:</strong><br>
+        • Payment via BPI: Edralene Balase (8039-417-406)<br>
+        • Payment via GCash: 0921-721-6447<br>
+        • Custom orders require a 40% downpayment before processing.<br>
+        • Full payment is required upon delivery or pick-up.
+    </div>
+
+    <div class="signatures">
+        <div class="sig-box">
+            <div class="sig-line" contenteditable="true">Edralene Balase</div>
+            <div style="font-size: 11px;">Authorized Personnel</div>
+        </div>
+        <div class="sig-box">
+            <div class="sig-line" contenteditable="true"></div>
+            <div style="font-size: 11px;">Received by / Date</div>
         </div>
     </div>
 </div>
 
 <script>
-    function calc() {
+    function calculate() {
         let rows = document.querySelectorAll('.item-row');
         let total = 0;
         rows.forEach(row => {
-            let cells = row.querySelectorAll('td');
-            let q = parseFloat(cells[1].innerText) || 0;
-            let r = parseFloat(cells[2].innerText.replace(/,/g, '')) || 0;
+            let q = parseFloat(row.cells[1].innerText) || 0;
+            let r = parseFloat(row.cells[2].innerText.replace(/,/g, '')) || 0;
             let a = q * r;
-            cells[3].innerText = a.toLocaleString(undefined, {minimumFractionDigits: 2});
+            row.cells[3].innerText = a.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             total += a;
         });
-        document.getElementById('grand-total').innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('grand-total').innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
     }
 
     function addRow() {
-        let tbody = document.getElementById('receipt-items');
-        let newRow = document.createElement('tr');
-        newRow.className = 'item-row';
-        newRow.innerHTML = `
+        let tbody = document.getElementById('item-list');
+        let row = tbody.insertRow();
+        row.className = "item-row";
+        row.innerHTML = `
             <td contenteditable="true">New Item</td>
-            <td style="text-align:center" contenteditable="true" oninput="calc()">0</td>
-            <td style="text-align:right" contenteditable="true" oninput="calc()">0.00</td>
-            <td style="text-align:right" class="amt">0.00</td>
+            <td class="col-qty" contenteditable="true" oninput="calculate()">0</td>
+            <td class="col-rate" contenteditable="true" oninput="calculate()">0.00</td>
+            <td class="col-amt">0.00</td>
         `;
-        tbody.appendChild(newRow);
-        calc();
     }
 
     function removeRow() {
-        let rows = document.querySelectorAll('.item-row');
-        if (rows.length > 1) {
-            rows[rows.length - 1].remove();
-            calc();
+        let tbody = document.getElementById('item-list');
+        if(tbody.rows.length > 1) {
+            tbody.deleteRow(-1);
+            calculate();
         }
     }
 </script>
