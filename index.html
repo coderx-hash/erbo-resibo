@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Acknowledgement Receipt - ERB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editable Receipt - ERB</title>
     <style>
         :root {
             --primary-dark: #1e272e;
@@ -69,6 +70,8 @@
         .brand p { margin: 2px 0; font-size: 12px; color: #555; }
 
         .title-box { text-align: right; }
+        
+        /* Editable Title Styling */
         .title-box h2 { 
             margin: 0; 
             font-size: 20px; 
@@ -77,11 +80,14 @@
             letter-spacing: 1px;
             border-bottom: 1px solid #ddd;
             padding-bottom: 5px;
+            min-width: 200px;
+            display: inline-block;
         }
 
         /* Editable Areas */
-        [contenteditable="true"] { outline: none; transition: 0.2s; }
-        [contenteditable="true"]:focus { background: #fff9c4; padding: 0 2px; }
+        [contenteditable="true"] { outline: none; transition: 0.2s; border-radius: 3px; }
+        [contenteditable="true"]:focus { background: #fff9c4; padding: 0 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+        [contenteditable="true"]:hover { background: #f0f4f8; }
 
         .meta-info { margin-top: 10px; font-size: 13px; color: #333; }
 
@@ -141,6 +147,8 @@
             body { background: white; padding: 0; }
             .toolbar { display: none; }
             .page { margin: 0; box-shadow: none; width: 210mm; height: 297mm; }
+            [contenteditable="true"]:focus { background: transparent; }
+            [contenteditable="true"]:hover { background: transparent; }
         }
     </style>
 </head>
@@ -161,7 +169,7 @@
             <p contenteditable="true">Phone: 0921-721-6447</p>
         </div>
         <div class="title-box">
-            <h2>Acknowledgement Receipt</h2>
+            <h2 contenteditable="true">Acknowledgement Receipt</h2>
             <div class="meta-info">
                 <div contenteditable="true">Date: January 29, 2026</div>
                 <div contenteditable="true">Receipt No: 2025-AR-001</div>
@@ -234,8 +242,12 @@
         let rows = document.querySelectorAll('.item-row');
         let total = 0;
         rows.forEach(row => {
-            let q = parseFloat(row.cells[1].innerText) || 0;
-            let r = parseFloat(row.cells[2].innerText.replace(/,/g, '')) || 0;
+            let qText = row.cells[1].innerText.replace(/,/g, '');
+            let rText = row.cells[2].innerText.replace(/,/g, '');
+            
+            let q = parseFloat(qText) || 0;
+            let r = parseFloat(rText) || 0;
+            
             let a = q * r;
             row.cells[3].innerText = a.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             total += a;
@@ -253,6 +265,7 @@
             <td class="col-rate" contenteditable="true" oninput="calculate()">0.00</td>
             <td class="col-amt">0.00</td>
         `;
+        calculate();
     }
 
     function removeRow() {
